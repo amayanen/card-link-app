@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>カードリンクアプリ</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Kaku Gothic Pro', 'Yu Gothic', sans-serif;
+      background: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+    }
+
+    /* 左パネル：カード一覧 */
+    #left-panel {
+      width: 55%;
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    #left-panel h2 {
+      color: #e0e0e0;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      opacity: 0.6;
+    }
+
+    #card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px 8px;
+      cursor: pointer;
+      aspect-ratio: 2.5 / 3.5;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+      position: relative;
+      user-select: none;
+    }
+
+    .card:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    .card.active {
+      outline: 3px solid #f5c518;
+      box-shadow: 0 0 18px rgba(245,197,24,0.7);
+    }
+
+    .card.red { color: #d32f2f; }
+    .card.black { color: #1a1a2e; }
+
+    .card-top {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      line-height: 1.1;
+    }
+
+    .card-num {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .card-suit-small {
+      font-size: 14px;
+    }
+
+    .card-suit-center {
+      font-size: 40px;
+      text-align: center;
+      line-height: 1;
+      align-self: center;
+    }
+
+    .card-bottom {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      transform: rotate(180deg);
+      line-height: 1.1;
+    }
+
+    /* 右パネル：アイテム表示 */
+    #right-panel {
+      width: 45%;
+      background: #16213e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      border-left: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    #item-display {
+      text-align: center;
+    }
+
+    #item-card-label {
+      font-size: 18px;
+      color: #888;
+      margin-bottom: 16px;
+      min-height: 28px;
+      transition: opacity 0.2s;
+    }
+
+    #item-name {
+      font-size: 64px;
+      font-weight: 700;
+      color: #fff;
+      min-height: 80px;
+      transition: all 0.2s;
+      letter-spacing: 2px;
+    }
+
+    #item-name.empty {
+      font-size: 20px;
+      color: rgba(255,255,255,0.2);
+      font-weight: 400;
+    }
+
+    #item-suit-big {
+      font-size: 80px;
+      margin-bottom: 12px;
+      min-height: 90px;
+      transition: opacity 0.2s;
+    }
+
+    .suit-red { color: #ef5350; }
+    .suit-black { color: #e0e0e0; }
+
+    #hint {
+      margin-top: 32px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.25);
+    }
+  </style>
+</head>
+<body>
+
+<div id="left-panel">
+  <h2>カードを選んでください</h2>
+  <div id="card-grid"></div>
+</div>
+
+<div id="right-panel">
+  <div id="item-display">
+    <div id="item-suit-big"></div>
+    <div id="item-card-label"></div>
+    <div id="item-name" class="empty">← カードをクリック</div>
+  </div>
+  <div id="hint">カードをクリックするとアイテムが表示されます</div>
+</div>
+
+<script>
+  const CARDS = [
+    { suit: 'heart',   suitSym: '♥', num: 2,  label: 'ハート2',  item: 'はにわ',     color: 'red'   },
+    { suit: 'heart',   suitSym: '♥', num: 3,  label: 'ハート3',  item: 'はさみ',     color: 'red'   },
+    { suit: 'heart',   suitSym: '♥', num: 4,  label: 'ハート4',  item: 'はし',       color: 'red'   },
+    { suit: 'heart',   suitSym: '♥', num: 6,  label: 'ハート6',  item: 'ハム',       color: 'red'   },
+    { suit: 'heart',   suitSym: '♥', num: 7,  label: 'ハート7',  item: '花火',       color: 'red'   },
+    { suit: 'heart',   suitSym: '♥', num: 10, label: 'ハート10', item: 'ハト',       color: 'red'   },
+    { suit: 'diamond', suitSym: '♦', num: 1,  label: 'ダイヤA',  item: 'たいやき',   color: 'red'   },
+    { suit: 'diamond', suitSym: '♦', num: 2,  label: 'ダイヤ2',  item: 'ダニ',       color: 'red'   },
+    { suit: 'diamond', suitSym: '♦', num: 4,  label: 'ダイヤ4',  item: 'だし巻き',   color: 'red'   },
+    { suit: 'diamond', suitSym: '♦', num: 7,  label: 'ダイヤ7',  item: '棚',         color: 'red'   },
+    { suit: 'diamond', suitSym: '♦', num: 8,  label: 'ダイヤ8',  item: 'たっぱー',   color: 'red'   },
+    { suit: 'club',    suitSym: '♣', num: 8,  label: 'クローバー8',  item: 'クッパ',  color: 'black' },
+    { suit: 'club',    suitSym: '♣', num: 13, label: 'クローバーK',  item: 'クッキー', color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 1,  label: 'スペードA',  item: 'すいか',   color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 2,  label: 'スペード2',  item: 'スニーカー', color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 4,  label: 'スペード4',  item: 'すし',     color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 6,  label: 'スペード6',  item: 'スロット',  color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 7,  label: 'スペード7',  item: '砂時計',   color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 10, label: 'スペード10', item: 'ストロー',  color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 13, label: 'スペードK',  item: 'スキー',   color: 'black' },
+  ];
+
+  function numLabel(n) {
+    if (n === 1)  return 'A';
+    if (n === 13) return 'K';
+    return String(n);
+  }
+
+  const grid = document.getElementById('card-grid');
+  const itemName = document.getElementById('item-name');
+  const itemLabel = document.getElementById('item-card-label');
+  const itemSuit = document.getElementById('item-suit-big');
+
+  let activeEl = null;
+
+  CARDS.forEach((c, i) => {
+    const el = document.createElement('div');
+    el.className = `card ${c.color}`;
+    el.innerHTML = `
+      <div class="card-top">
+        <span class="card-num">${numLabel(c.num)}</span>
+        <span class="card-suit-small">${c.suitSym}</span>
+      </div>
+      <div class="card-suit-center">${c.suitSym}</div>
+      <div class="card-bottom">
+        <span class="card-num">${numLabel(c.num)}</span>
+        <span class="card-suit-small">${c.suitSym}</span>
+      </div>
+    `;
+
+    el.addEventListener('click', () => {
+      if (activeEl) activeEl.classList.remove('active');
+      el.classList.add('active');
+      activeEl = el;
+
+      itemSuit.textContent = c.suitSym;
+      itemSuit.className = c.color === 'red' ? 'suit-red' : 'suit-black';
+      itemLabel.textContent = c.label;
+      itemName.textContent = c.item;
+      itemName.classList.remove('empty');
+    });
+
+    grid.appendChild(el);
+  });
+</script>
+</body>
+</html>
