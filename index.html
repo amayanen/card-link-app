@@ -117,42 +117,60 @@
     }
 
     #item-card-label {
-      font-size: 18px;
+      font-size: 16px;
       color: #888;
-      margin-bottom: 16px;
-      min-height: 28px;
-      transition: opacity 0.2s;
+      margin-bottom: 20px;
+      min-height: 24px;
+    }
+
+    #item-illustration {
+      font-size: 120px;
+      line-height: 1;
+      margin-bottom: 20px;
+      min-height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s;
+    }
+
+    #item-illustration.pop {
+      animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes pop {
+      0%   { transform: scale(0.4); opacity: 0; }
+      100% { transform: scale(1);   opacity: 1; }
     }
 
     #item-name {
-      font-size: 64px;
+      font-size: 48px;
       font-weight: 700;
       color: #fff;
-      min-height: 80px;
-      transition: all 0.2s;
-      letter-spacing: 2px;
+      min-height: 64px;
+      letter-spacing: 3px;
     }
 
     #item-name.empty {
-      font-size: 20px;
+      font-size: 18px;
       color: rgba(255,255,255,0.2);
       font-weight: 400;
+      letter-spacing: 1px;
     }
 
     #item-suit-big {
-      font-size: 80px;
-      margin-bottom: 12px;
-      min-height: 90px;
-      transition: opacity 0.2s;
+      font-size: 48px;
+      margin-bottom: 8px;
+      min-height: 56px;
     }
 
     .suit-red { color: #ef5350; }
     .suit-black { color: #e0e0e0; }
 
     #hint {
-      margin-top: 32px;
+      margin-top: 28px;
       font-size: 13px;
-      color: rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.2);
     }
   </style>
 </head>
@@ -167,6 +185,7 @@
   <div id="item-display">
     <div id="item-suit-big"></div>
     <div id="item-card-label"></div>
+    <div id="item-illustration"></div>
     <div id="item-name" class="empty">← カードをクリック</div>
   </div>
   <div id="hint">カードをクリックするとアイテムが表示されます</div>
@@ -174,26 +193,26 @@
 
 <script>
   const CARDS = [
-    { suit: 'heart',   suitSym: '♥', num: 2,  label: 'ハート2',  item: 'はにわ',     color: 'red'   },
-    { suit: 'heart',   suitSym: '♥', num: 3,  label: 'ハート3',  item: 'はさみ',     color: 'red'   },
-    { suit: 'heart',   suitSym: '♥', num: 4,  label: 'ハート4',  item: 'はし',       color: 'red'   },
-    { suit: 'heart',   suitSym: '♥', num: 6,  label: 'ハート6',  item: 'ハム',       color: 'red'   },
-    { suit: 'heart',   suitSym: '♥', num: 7,  label: 'ハート7',  item: '花火',       color: 'red'   },
-    { suit: 'heart',   suitSym: '♥', num: 10, label: 'ハート10', item: 'ハト',       color: 'red'   },
-    { suit: 'diamond', suitSym: '♦', num: 1,  label: 'ダイヤA',  item: 'たいやき',   color: 'red'   },
-    { suit: 'diamond', suitSym: '♦', num: 2,  label: 'ダイヤ2',  item: 'ダニ',       color: 'red'   },
-    { suit: 'diamond', suitSym: '♦', num: 4,  label: 'ダイヤ4',  item: 'だし巻き',   color: 'red'   },
-    { suit: 'diamond', suitSym: '♦', num: 7,  label: 'ダイヤ7',  item: '棚',         color: 'red'   },
-    { suit: 'diamond', suitSym: '♦', num: 8,  label: 'ダイヤ8',  item: 'たっぱー',   color: 'red'   },
-    { suit: 'club',    suitSym: '♣', num: 8,  label: 'クローバー8',  item: 'クッパ',  color: 'black' },
-    { suit: 'club',    suitSym: '♣', num: 13, label: 'クローバーK',  item: 'クッキー', color: 'black' },
-    { suit: 'spade',   suitSym: '♠', num: 1,  label: 'スペードA',  item: 'すいか',   color: 'black' },
-    { suit: 'spade',   suitSym: '♠', num: 2,  label: 'スペード2',  item: 'スニーカー', color: 'black' },
-    { suit: 'spade',   suitSym: '♠', num: 4,  label: 'スペード4',  item: 'すし',     color: 'black' },
-    { suit: 'spade',   suitSym: '♠', num: 6,  label: 'スペード6',  item: 'スロット',  color: 'black' },
-    { suit: 'spade',   suitSym: '♠', num: 7,  label: 'スペード7',  item: '砂時計',   color: 'black' },
-    { suit: 'spade',   suitSym: '♠', num: 10, label: 'スペード10', item: 'ストロー',  color: 'black' },
-    { suit: 'spade',   suitSym: '♠', num: 13, label: 'スペードK',  item: 'スキー',   color: 'black' },
+    { suit: 'heart',   suitSym: '♥', num: 2,  label: 'ハート2',      item: 'はにわ',     illust: '🗿', color: 'red'   },
+    { suit: 'heart',   suitSym: '♥', num: 3,  label: 'ハート3',      item: 'はさみ',     illust: '✂️', color: 'red'   },
+    { suit: 'heart',   suitSym: '♥', num: 4,  label: 'ハート4',      item: 'はし',       illust: '🥢', color: 'red'   },
+    { suit: 'heart',   suitSym: '♥', num: 6,  label: 'ハート6',      item: 'ハム',       illust: '🥩', color: 'red'   },
+    { suit: 'heart',   suitSym: '♥', num: 7,  label: 'ハート7',      item: '花火',       illust: '🎆', color: 'red'   },
+    { suit: 'heart',   suitSym: '♥', num: 10, label: 'ハート10',     item: 'ハト',       illust: '🕊️', color: 'red'   },
+    { suit: 'diamond', suitSym: '♦', num: 1,  label: 'ダイヤA',      item: 'たいやき',   illust: '🐟', color: 'red'   },
+    { suit: 'diamond', suitSym: '♦', num: 2,  label: 'ダイヤ2',      item: 'ダニ',       illust: '🦠', color: 'red'   },
+    { suit: 'diamond', suitSym: '♦', num: 4,  label: 'ダイヤ4',      item: 'だし巻き',   illust: '🍳', color: 'red'   },
+    { suit: 'diamond', suitSym: '♦', num: 7,  label: 'ダイヤ7',      item: '棚',         illust: '🗄️', color: 'red'   },
+    { suit: 'diamond', suitSym: '♦', num: 8,  label: 'ダイヤ8',      item: 'たっぱー',   illust: '📦', color: 'red'   },
+    { suit: 'club',    suitSym: '♣', num: 8,  label: 'クローバー8',  item: 'クッパ',     illust: '🐢', color: 'black' },
+    { suit: 'club',    suitSym: '♣', num: 13, label: 'クローバーK',  item: 'クッキー',   illust: '🍪', color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 1,  label: 'スペードA',    item: 'すいか',     illust: '🍉', color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 2,  label: 'スペード2',    item: 'スニーカー', illust: '👟', color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 4,  label: 'スペード4',    item: 'すし',       illust: '🍣', color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 6,  label: 'スペード6',    item: 'スロット',   illust: '🎰', color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 7,  label: 'スペード7',    item: '砂時計',     illust: '⏳', color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 10, label: 'スペード10',   item: 'ストロー',   illust: '🥤', color: 'black' },
+    { suit: 'spade',   suitSym: '♠', num: 13, label: 'スペードK',    item: 'スキー',     illust: '⛷️', color: 'black' },
   ];
 
   function numLabel(n) {
@@ -206,10 +225,11 @@
   const itemName = document.getElementById('item-name');
   const itemLabel = document.getElementById('item-card-label');
   const itemSuit = document.getElementById('item-suit-big');
+  const itemIllust = document.getElementById('item-illustration');
 
   let activeEl = null;
 
-  CARDS.forEach((c, i) => {
+  CARDS.forEach((c) => {
     const el = document.createElement('div');
     el.className = `card ${c.color}`;
     el.innerHTML = `
@@ -234,6 +254,12 @@
       itemLabel.textContent = c.label;
       itemName.textContent = c.item;
       itemName.classList.remove('empty');
+
+      // イラストをポップアニメーションで表示
+      itemIllust.classList.remove('pop');
+      void itemIllust.offsetWidth; // reflow to restart animation
+      itemIllust.textContent = c.illust;
+      itemIllust.classList.add('pop');
     });
 
     grid.appendChild(el);
